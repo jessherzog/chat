@@ -1,25 +1,22 @@
 var socket = io();
 
+var usr = "";
+
 // ==== WELCOME MSG ==== //
 //client listens for welcome message, 
 //inputs sent welcomeDataObj as 'data' within new function
 socket.on('welcome msg', function(w_data){
 	$('#msgs').append($('<li>').text(w_data.message));
-	showHIST(w_data.chatlog);
+	usr = w_data.curr_user;
+	showHIST(w_data);
 })
 
 // ==== USERNAME + CHAT MSG ==== //
-var usr = "";
+$('#cust').on('click', function(){
+    var usr = prompt("create a username", "");
+})
 
 function sendMSG() {
-	$('#cust').on('click', function(){
-	    var username = prompt("create a username", "");
-		if (username != "") {
-	        usr = username;
-	    } else {
-	    	usr = "User" + socket.conn.server.clientsCount;
-	    }
-	})
 	var msg_data = {
 		'usr'	: usr,
 		'msg'	: $('#m').val()
@@ -40,14 +37,13 @@ $('#hist').on('click', function(){
 	socket.emit('get full history');
 }); 
 
-var showHIST = function(chatlog){
-	for (var i = 0; i < chatlog.length; i++){
-		var namespace = chatlog[i].user;
-		var existingMsgs = namespace + ": " + chatlog[i].message;
+var showHIST = function(data){
+	for (var i = 0; i < data.length; i++){
+		var existingMsgs = data[i].message;
 		$('#msgs').append($('<li>').text(existingMsgs));	
 	}
 }
 
 socket.on('full history log', function(data){
-	showHIST(data.chatlog);
+	showHIST(data);
 });
